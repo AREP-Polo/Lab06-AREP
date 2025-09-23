@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Property Management System</h1>
+
+        <div class="form-section">
+            <h2>Add/Edit Property</h2>
+            <form id="propertyForm">
+                <input type="hidden" id="propertyId">
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price:</label>
+                    <input type="number" id="price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="size">Size (sq ft):</label>
+                    <input type="number" id="size" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" required></textarea>
+                </div>
+                <button type="submit" id="submitBtn">Add Property</button>
+                <button type="button" id="cancelBtn" style="display:none;">Cancel</button>
+            </form>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="list-section">
+            <h2>Properties List</h2>
+            <div id="propertiesList"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
