@@ -39,6 +39,7 @@ function getFormData() {
 }
 
 function createProperty(property) {
+    showLoading();
     fetch(API_BASE_URL, {
         method: 'POST',
         headers: {
@@ -47,19 +48,24 @@ function createProperty(property) {
         body: JSON.stringify(property)
     })
         .then(response => {
+            hideLoading();
             if (response.ok) {
                 showMessage('Property created successfully.', 'success');
                 resetForm();
                 loadProperties();
             } else {
-                showMessage('Failed to create property.', 'error');
+                response.text().then(text => showMessage(text || 'Failed to create property.', 'error'));
             }
         })
-        .catch(error => showMessage('Error: ' + error.message, 'error'));
+        .catch(error => {
+            hideLoading();
+            showMessage('Error: ' + error.message, 'error');
+        });
 }
 
 function updateProperty(property) {
     const id = document.getElementById('propertyId').value;
+    showLoading();
     fetch(`${API_BASE_URL}/${id}`, {
         method: 'PUT',
         headers: {
@@ -68,39 +74,59 @@ function updateProperty(property) {
         body: JSON.stringify(property)
     })
         .then(response => {
+            hideLoading();
             if (response.ok) {
                 showMessage('Property updated successfully.', 'success');
                 resetForm();
                 loadProperties();
             } else {
-                showMessage('Failed to update property.', 'error');
+                response.text().then(text => showMessage(text || 'Failed to update property.', 'error'));
             }
         })
-        .catch(error => showMessage('Error: ' + error.message, 'error'));
+        .catch(error => {
+            hideLoading();
+            showMessage('Error: ' + error.message, 'error');
+        });
 }
 
 function deleteProperty(id) {
     if (confirm('Are you sure you want to delete this property?')) {
+        showLoading();
         fetch(`${API_BASE_URL}/${id}`, {
             method: 'DELETE'
         })
             .then(response => {
+                hideLoading();
                 if (response.ok) {
                     showMessage('Property deleted successfully.', 'success');
                     loadProperties();
                 } else {
-                    showMessage('Failed to delete property.', 'error');
+                    response.text().then(text => showMessage(text || 'Failed to delete property.', 'error'));
                 }
             })
-            .catch(error => showMessage('Error: ' + error.message, 'error'));
+            .catch(error => {
+                hideLoading();
+                showMessage('Error: ' + error.message, 'error');
+            });
     }
 }
 
 function loadProperties() {
+    showLoading();
     fetch(API_BASE_URL)
-        .then(response => response.json())
+        .then(response => {
+            hideLoading();
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to load properties');
+            }
+        })
         .then(data => displayProperties(data))
-        .catch(error => showMessage('Error loading properties: ' + error.message, 'error'));
+        .catch(error => {
+            hideLoading();
+            showMessage('Error loading properties: ' + error.message, 'error');
+        });
 }
 
 function displayProperties(properties) {
@@ -124,8 +150,16 @@ function displayProperties(properties) {
 }
 
 function editProperty(id) {
+    showLoading();
     fetch(`${API_BASE_URL}/${id}`)
-        .then(response => response.json())
+        .then(response => {
+            hideLoading();
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Property not found');
+            }
+        })
         .then(property => {
             document.getElementById('propertyId').value = property.id;
             document.getElementById('address').value = property.address;
@@ -135,7 +169,10 @@ function editProperty(id) {
             document.getElementById('submitBtn').textContent = 'Update Property';
             document.getElementById('cancelBtn').style.display = 'inline-block';
         })
-        .catch(error => showMessage('Error loading property: ' + error.message, 'error'));
+        .catch(error => {
+            hideLoading();
+            showMessage('Error loading property: ' + error.message, 'error');
+        });
 }
 
 function cancelEdit() {
@@ -157,4 +194,12 @@ function resetForm() {
     document.getElementById('propertyId').value = '';
     document.getElementById('submitBtn').textContent = 'Add Property';
     document.getElementById('cancelBtn').style.display = 'none';
+}
+
+function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+}
+
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
 }
