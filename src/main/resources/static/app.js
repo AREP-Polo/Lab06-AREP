@@ -1,8 +1,14 @@
 const API_BASE_URL = 'http://localhost:8080/api/properties';
 
+let allProperties = [];
+let filteredProperties = [];
+let currentPage = 1;
+let pageSize = 10;
+
 document.addEventListener('DOMContentLoaded', function () {
     loadProperties();
     setupForm();
+    setupSearchAndPagination();
 });
 
 function setupForm() {
@@ -11,6 +17,27 @@ function setupForm() {
 
     form.addEventListener('submit', handleFormSubmit);
     cancelBtn.addEventListener('click', cancelEdit);
+}
+
+function setupSearchAndPagination() {
+    const searchAddress = document.getElementById('searchAddress');
+    const minPrice = document.getElementById('minPrice');
+    const maxPrice = document.getElementById('maxPrice');
+    const minSize = document.getElementById('minSize');
+    const maxSize = document.getElementById('maxSize');
+    const clearFilters = document.getElementById('clearFilters');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+    const pageSizeSelect = document.getElementById('pageSize');
+
+    [searchAddress, minPrice, maxPrice, minSize, maxSize].forEach(input => {
+        input.addEventListener('input', handleSearch);
+    });
+
+    clearFilters.addEventListener('click', clearAllFilters);
+    prevPage.addEventListener('click', () => goToPage(currentPage - 1));
+    nextPage.addEventListener('click', () => goToPage(currentPage + 1));
+    pageSizeSelect.addEventListener('change', handlePageSizeChange);
 }
 
 function handleFormSubmit(event) {
@@ -122,16 +149,79 @@ function loadProperties() {
                 throw new Error('Failed to load properties');
             }
         })
-        .then(data => displayProperties(data))
+        .then(data => {
+            allProperties = Array.isArray(data) ? data : data.content || [];
+            handleSearch();
+        })
         .catch(error => {
             hideLoading();
             showMessage('Error loading properties: ' + error.message, 'error');
         });
 }
 
+function handleSearch() {
+    const addressFilter = document.getElementById('searchAddress').value.toLowerCase().trim();
+    const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+    const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+    const minSize = parseInt(document.getElementById('minSize').value) || 0;
+    const maxSize = parseInt(document.getElementById('maxSize').value) || Infinity;
+
+    filteredProperties = allProperties.filter(property => {
+        const matchesAddress = !addressFilter || property.address.toLowerCase().includes(addressFilter);
+        const matchesPrice = property.price >= minPrice && property.price <= maxPrice;
+        const matchesSize = property.size >= minSize && property.size <= maxSize;
+
+        return matchesAddress && matchesPrice && matchesSize;
+    });
+
+    currentPage = 1;
+    displayPaginatedProperties();
+    updatePaginationControls();
+    updateResultsCount();
+}
+
+function clearAllFilters() {
+    document.getElementById('searchAddress').value = '';
+    document.getElementById('minPrice').value = '';
+    document.getElementById('maxPrice').value = '';
+    document.getElementById('minSize').value = '';
+    document.getElementById('maxSize').value = '';
+    handleSearch();
+}
+
+function goToPage(page) {
+    const totalPages = Math.ceil(filteredProperties.length / pageSize);
+    if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        displayPaginatedProperties();
+        updatePaginationControls();
+    }
+}
+
+function handlePageSizeChange() {
+    pageSize = parseInt(document.getElementById('pageSize').value);
+    currentPage = 1;
+    displayPaginatedProperties();
+    updatePaginationControls();
+}
+
+function displayPaginatedProperties() {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedProperties = filteredProperties.slice(startIndex, endIndex);
+
+    displayProperties(paginatedProperties);
+}
+
 function displayProperties(properties) {
     const list = document.getElementById('propertiesList');
     list.innerHTML = '';
+
+    if (properties.length === 0) {
+        list.innerHTML = '<p style="text-align: center; color: #666;">No properties found.</p>';
+        return;
+    }
+
     properties.forEach(property => {
         const item = document.createElement('div');
         item.className = 'property-item';
@@ -147,6 +237,24 @@ function displayProperties(properties) {
         `;
         list.appendChild(item);
     });
+}
+
+function updatePaginationControls() {
+    const totalPages = Math.ceil(filteredProperties.length / pageSize);
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    const pageInfo = document.getElementById('pageInfo');
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+    pageInfo.textContent = totalPages === 0 ? 'Page 0 of 0' : `Page ${currentPage} of ${totalPages}`;
+}
+
+function updateResultsCount() {
+    const count = filteredProperties.length;
+    const countElement = document.getElementById('resultsCount');
+    countElement.textContent = `${count} ${count === 1 ? 'property' : 'properties'} found`;
 }
 
 function editProperty(id) {

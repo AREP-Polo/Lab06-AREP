@@ -43,7 +43,34 @@
 
         <div class="list-section">
             <h2>Properties List</h2>
+
+            <div class="search-section">
+                <div class="search-filters">
+                    <input type="text" id="searchAddress" placeholder="Search by address...">
+                    <input type="number" id="minPrice" placeholder="Min Price" step="0.01">
+                    <input type="number" id="maxPrice" placeholder="Max Price" step="0.01">
+                    <input type="number" id="minSize" placeholder="Min Size (sq ft)">
+                    <input type="number" id="maxSize" placeholder="Max Size (sq ft)">
+                    <button type="button" id="clearFilters">Clear Filters</button>
+                </div>
+            </div>
+
+            <div class="pagination-info">
+                <span id="resultsCount">0 properties found</span>
+            </div>
+
             <div id="propertiesList"></div>
+
+            <div class="pagination-controls">
+                <button id="prevPage" disabled>Previous</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button id="nextPage" disabled>Next</button>
+                <select id="pageSize">
+                    <option value="5">5 per page</option>
+                    <option value="10" selected>10 per page</option>
+                    <option value="20">20 per page</option>
+                </select>
+            </div>
         </div>
     </div>
 

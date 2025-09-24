@@ -114,3 +114,66 @@ button:hover {
     padding: 5px 10px;
     font-size: 14px;
 }
+
+.search-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.search-filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-filters input {
+    margin: 0;
+}
+
+.pagination-info {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #666;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+.pagination-controls button {
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.pagination-controls button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination-controls button:disabled:hover {
+    background-color: #ccc;
+}
+
+#pageInfo {
+    font-weight: bold;
+    color: #333;
+}
+
+#pageSize {
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
