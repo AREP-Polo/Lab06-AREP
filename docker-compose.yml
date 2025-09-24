@@ -15,4 +15,3 @@ services:
       MYSQL_DATABASE: property_management
     ports:
       - "3306:3306"
-    image: nella1414/property-management-mysql:latest
